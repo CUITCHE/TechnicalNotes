@@ -3,3 +3,6 @@
 
 iOS相关目录
 * [iOS-UITableView之delegate方法的缓存](./iOS-UITableView之delegate方法的缓存.md)
+
+# LICENSE
+GNU General Public License v3.0
