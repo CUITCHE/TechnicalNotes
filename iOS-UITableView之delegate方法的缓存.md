@@ -518,7 +518,7 @@ typedef struct _TableViewFlags
 这里在定义_Type类型的时候不建议用int，1个bit的int，在输出表示的时候，会被输出成『-1』或者『0』，1个bit的int这唯一的空间被拿去表示正负数了- =。
 ```
 
-Objective-C的成员变量，我们可以通过实例对象地址+成员变量地址偏移获得。利用这个，我们就可以获取到`_tableFlags`的值了。我们改造一下刚刚的函数吧：
+Objective-C的成员变量，我们可以通过`实例对象地址`+`成员变量地址偏移`获得。利用这个，我们就可以获取到`_tableFlags`的值了。我们改造一下刚刚的函数吧：
 
 ```Objective-C
 - (void)onButtonClicked:(id)sender
@@ -740,14 +740,14 @@ Objective-C的成员变量，我们可以通过实例对象地址+成员变量�
 
 ---
 
-## 至于为什么Apple要在我们设置delegate的时候对delegate的方法进行一次询问并缓存询问的结果呢。
+## 至于为什么Apple要在我们设置delegate的时候对delegate的方法进行一次询问并缓存询问的结果呢
 
 我想每次运行到需要调用delegate的方法的时候就去调用一次`respondsToSelector:`去询问的代价相比一开始就把询问结果给缓存起来的代价要大很多。缓存后，运行时，只需要查询缓存结果就知道需不需要调用delegate的方法，这个速度会快很多！
 
 毕竟也没有谁像我一样在运行时去添加一个`UITableViewDataSource或UITableViewDelegate`中在编译时不存在的方法吧。
 
-## 适时更新TablFlag缓存
-所以，得到这些信息，我们在加载完JSPatch后更改一下对应缓存的值就行了。或许，你觉得直接重新对delegate进行一次赋值不就好了吗。就像这样
+## 适时更新TableFlag缓存
+得到这些信息后，我们在加载完JSPatch后更改一下对应缓存的值就行了。或许，你会觉得直接重新对delegate进行一次赋值不就好了吗。就像这样
 
 ```Objective-C
 _tableView.delegate = nil;
@@ -755,6 +755,8 @@ _tableView.dataSource = nil;
 _tableView.delegate = self;
 _tableView.dataSource = self;
 ```
-好吧，我承认这样一样有效，但是我不能保证这样没有副作用。建议还是直接更新缓存吧！
+好吧，我承认这样一样有效，但是我不能保证这样没有副作用。建议还是直接更新缓存吧！直接更新缓存肯定比重新赋值要快很多！
 
-*第一次完稿：2016-04-01 16:08:07*
+## 修订记录
+* 2016-04-01 16:08:07 第一次完稿
+* 2016-04-01 16:22:40 修正用词
