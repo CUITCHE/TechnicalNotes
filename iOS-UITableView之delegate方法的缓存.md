@@ -135,4 +135,200 @@
 
 > JS文件，请参考：[onTableCellClicked](./res/onTableCellClicked.js)
 
-于是，
+一般地，我们在使用delegate调用方法的时候，为了不引起程序crash，都会小心的加上一句：`[obj respondsToSelector:aSelector]`，去询问『我可以调这个方法』，如果不行就不调用了，免得crash。
+当然，UITableView肯定也会调用`[obj respondsToSelector:aSelector]`的，所以我重写ViewController的`respondsToSelector:`方法。
+
+```Objective-C
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+    NSLog(@"%@", NSStringFromSelector(aSelector));
+    return [super respondsToSelector:aSelector];
+}
+```
+
+为了不产生副作用，我直接在重写的方法中调用了父类的方法，并打印selecotr字符串。运行程序，程序输出了：
+
+```
+2016-04-01 14:57:32.157 OCRumtiimInvoke[4675:237601] isInWillRotateCallback
+2016-04-01 14:57:32.160 OCRumtiimInvoke[4675:237601] rotatingContentViewForWindow:
+2016-04-01 14:57:32.187 OCRumtiimInvoke[4675:237601] _isViewControllerInWindowHierarchy
+2016-04-01 14:57:32.189 OCRumtiimInvoke[4675:237601] scrollViewDidScroll:
+2016-04-01 14:57:32.189 OCRumtiimInvoke[4675:237601] scrollViewDidZoom:
+2016-04-01 14:57:32.189 OCRumtiimInvoke[4675:237601] scrollView:contentSizeForZoomScale:withProposedSize:
+2016-04-01 14:57:32.189 OCRumtiimInvoke[4675:237601] scrollViewDidChangeContentSize:
+2016-04-01 14:57:32.189 OCRumtiimInvoke[4675:237601] _scrollView:adjustedOffsetForOffset:translation:startPoint:locationInView:horizontalVelocity:verticalVelocity:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:cellForRowAtIndexPath:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:willDisplayCell:forRowAtIndexPath:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:didEndDisplayingCell:forRowAtIndexPath:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:didEndDisplayingHeaderView:forSection:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:didEndDisplayingFooterView:forSection:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:heightForRowAtIndexPath:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:heightForHeaderInSection:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:maxTitleWidthForHeaderInSection:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:heightForFooterInSection:
+2016-04-01 14:57:32.190 OCRumtiimInvoke[4675:237601] tableView:maxTitleWidthForFooterInSection:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:estimatedHeightForRowAtIndexPath:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:estimatedHeightForHeaderInSection:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:estimatedHeightForFooterInSection:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:viewForHeaderInSection:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:viewForFooterInSection:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:displayedItemCountForRowCount:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:displayStringForRowCount:
+2016-04-01 14:57:32.191 OCRumtiimInvoke[4675:237601] tableView:accessoryTypeForRowWithIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:accessoryButtonTappedForRowWithIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:willSelectRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:willDeselectRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:didSelectRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:didDeselectRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:willBeginEditingRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:didEndEditingRowAtIndexPath:
+2016-04-01 14:57:32.192 OCRumtiimInvoke[4675:237601] tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:editingStyleForRowAtIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:titleForDeleteConfirmationButtonForRowAtIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:editActionsForRowAtIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:shouldIndentWhileEditingRowAtIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:indentationLevelForRowAtIndexPath:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:wantsHeaderForSection:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] tableView:heightForRowsInSection:
+2016-04-01 14:57:32.193 OCRumtiimInvoke[4675:237601] marginForTableView:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] tableView:titleAlignmentForHeaderInSection:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] tableView:titleAlignmentForFooterInSection:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] tableView:frameForSectionIndexGivenProposedFrame:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] tableViewDidFinishReload:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] heightForHeaderInTableView:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] heightForFooterInTableView:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] viewForHeaderInTableView:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] viewForFooterInTableView:
+2016-04-01 14:57:32.194 OCRumtiimInvoke[4675:237601] tableView:calloutTargetRectForCell:forRowAtIndexPath:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:shouldShowMenuForRowAtIndexPath:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:canPerformAction:forRowAtIndexPath:withSender:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:performAction:forRowAtIndexPath:withSender:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:willBeginReorderingRowAtIndexPath:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:didEndReorderingRowAtIndexPath:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:didCancelReorderingRowAtIndexPath:
+2016-04-01 14:57:32.195 OCRumtiimInvoke[4675:237601] tableView:willDisplayHeaderView:forSection:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:willDisplayFooterView:forSection:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:shouldHighlightRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:didHighlightRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:didUnhighlightRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:titleForSwipeAccessoryButtonForRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:backgroundColorForDeleteConfirmationButtonForRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:backgroundColorForSwipeAccessoryButtonForRowAtIndexPath:
+2016-04-01 14:57:32.196 OCRumtiimInvoke[4675:237601] tableView:deleteConfirmationButtonForRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:swipeAccessoryButtonForRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:swipeAccessoryButtonPushedForRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:shouldDrawTopSeparatorForSection:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:willBeginSwipingRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:didEndSwipingRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] _tableView:canFocusRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:canFocusRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:didFocusRowAtIndexPath:
+2016-04-01 14:57:32.197 OCRumtiimInvoke[4675:237601] tableView:didUnfocusRowAtIndexPath:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] tableView:shouldChangeFocusedItem:fromRowAtIndexPath:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] indexPathForPreferredFocusedItemForTableView:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] tableView:shouldUpdateFocusFromRowAtIndexPath:toView:heading:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] indexPathForPreferredFocusedViewInTableView:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] tableView:shouldUpdateFocusInContext:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] tableView:didUpdateFocusInContext:withAnimationCoordinator:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] _tableView:templateLayoutCellForCellsWithReuseIdentifier:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] _tableView:willLayoutCell:usingTemplateLayoutCell:forRowAtIndexPath:
+2016-04-01 14:57:32.198 OCRumtiimInvoke[4675:237601] tableView:numberOfRowsInSection:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:cellForRowAtIndexPath:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] numberOfSectionsInTableView:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:titleForHeaderInSection:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:titleForFooterInSection:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:commitEditingStyle:forRowAtIndexPath:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] sectionIndexTitlesForTableView:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:sectionForSectionIndexTitle:atIndex:
+2016-04-01 14:57:32.199 OCRumtiimInvoke[4675:237601] tableView:moveRowAtIndexPath:toIndexPath:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:canEditRowAtIndexPath:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:canMoveRowAtIndexPath:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:didUpdateTextFieldForRowAtIndexPath:withValue:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:shouldShowMenuForRowAtIndexPath:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:canPerformAction:forRowAtIndexPath:withSender:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:performAction:forRowAtIndexPath:withSender:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:indexPathForSectionIndexTitle:atIndex:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:indexPathForSectionIndexTitle:atIndex:
+2016-04-01 14:57:32.200 OCRumtiimInvoke[4675:237601] tableView:detailTextForHeaderInSection:
+2016-04-01 14:57:32.201 OCRumtiimInvoke[4675:237601] _appearanceContainer
+```
+
+看到输出结果，此时我的内心是激动的。输出了所有`UITableViewDataSource, UITableViewDelegate`协议的方法名字，这就意味着，程序在某个地方对这两个协议的方法都询问了一遍。然后我又猜测，唯一的合理的地方应该是我们在设置UITableView的delegate和dataSource的时候执行询问操作的。因为只有设置了delegate了，对这些方法的询问才有意义。于是我在代码中注释了这两句
+```
+//    _tableView.delegate = self;
+//    _tableView.dataSource = self;
+```
+
+再执行程序，输出：
+```
+2016-04-01 15:01:16.516 OCRumtiimInvoke[4755:241107] isInWillRotateCallback
+2016-04-01 15:01:16.516 OCRumtiimInvoke[4755:241107] rotatingContentViewForWindow:
+2016-04-01 15:01:16.546 OCRumtiimInvoke[4755:241107] _isViewControllerInWindowHierarchy
+2016-04-01 15:01:16.550 OCRumtiimInvoke[4755:241107] _appearanceContainer
+```
+
+简直喜出望外！
+
+然后，问题来了：『那么，UITableView是怎么保存询问的结果的呢』。
+很多人就会想到用一个BOOL数组，可是这样太过于浪费了，在Objective-C中BOOL相当于一个int的大小。询问的结果只有两种：有(1)和没有(0)。所以，这个时候，我们就需要用到在C/C++中常用到的位域结构体了。
+
+> 关于位域的知识，请看[百科](http://baike.baidu.com/link?url=cWt3g5NhSJkqYXy5RPsEcgI2xiKd0K-G7zP8srRu4icleeDw5ow82Ljv13QHa_VBvw_xAr3AKm5NNzK9-wpVDq)，本文不做过多解释。
+
+Apple在设计UITableView的时候，肯定也想到了。所以，我们就大胆猜测，在UITableView中有这样一个结构体保存但不局限于`UITableViewDataSource, UITableViewDelegate`协议中的方法。
+
+但，我们怎么获取到这个变量呢。
+
+Objective-C作为一门动态语言，获取一个变量（私有）还是很容易的。随便到网上搜一篇就详细的讲解，我这里直接贴代码了：
+
+```Objective-C
+- (void)onButtonClicked:(id)sender
+{
+    Class curClass = NSClassFromString(@"UITableView");
+    unsigned int numIvars; //成员变量个数
+    Ivar *vars = class_copyIvarList(curClass, &numIvars);
+
+    NSString *name = nil;
+    NSString *type = nil;
+    for(int i = 0; i < numIvars; i++) {
+        Ivar thisIvar = vars[i];
+        //获取成员变量的名字
+        name = [NSString stringWithUTF8String:ivar_getName(thisIvar)];
+        //获取成员变量的数据类型
+        type = [NSString stringWithUTF8String:ivar_getTypeEncoding(thisIvar)];
+        @try {
+            NSLog(@"%@(%@):%@", name, type, [_tableView valueForKey:name]);
+        } @catch (NSException *exception) {
+            NSLog(@"%@", exception);
+        } @finally {
+            ;
+        }
+    }
+    free(vars);
+}
+```
+
+由于输出太多了，我就只截取重要部分：
+```
+2016-04-01 15:25:01.253 OCRumtiimInvoke[5077:257772] _targetIndexPathForScrolling(@"NSIndexPath"):(null)
+2016-04-01 15:25:01.254 OCRumtiimInvoke[5077:257772] _targetOffsetToIndexPathForScrolling({CGPoint="x"d"y"d}):NSPoint: {0, 0}
+2016-04-01 15:25:01.254 OCRumtiimInvoke[5077:257772] _tableFlags({?="dataSourceNumberOfRowsInSection"b1"dataSourceCellForRow"b1"dataSourceNumberOfSectionsInTableView"b1"dataSourceTitleForHeaderInSection"b1"dataSourceTitleForFooterInSection"b1"dataSourceDetailTextForHeaderInSection"b1"dataSourceCommitEditingStyle"b1"dataSourceSectionIndexTitlesForTableView"b1"dataSourceSectionForSectionIndexTitle"b1"dataSourceCanEditRow"b1"dataSourceCanMoveRow"b1"dataSourceCanUpdateRow"b1"dataSourceShouldShowMenu"b1"dataSourceCanPerformAction"b1"dataSourcePerformAction"b1"dataSourceIndexPathForSectionIndexTitle"b1"dataSourceWasNonNil"b1"delegateEditingStyleForRowAtIndexPath"b1"delegateTitleForDeleteConfirmationButtonForRowAtIndexPath"b1"delegateEditActionsForRowAtIndexPath"b1"delegateShouldIndentWhileEditing"b1"dataSourceMoveRow"b1"delegateCellForRow"b1"delegateWillDisplayCell"b1"delegateDidEndDisplayingCell"b1"delegateDidEndDisplayingSectionHeader"b1"delegateDidEndDisplayingSectionFooter"b1"delegateHeightForRow"b1"delegateHeightForSectionHeader"b1"delegateTitleWidthForSectionHeader"b1"delegateHeightForSectionFooter"b1"delegateTitleWidthForSectionFooter"b1"delegateEstimatedHeightForRow"b1"delegateEstimatedHeightForSectionHeader"b1"delegateEstimatedHeightForSectionFooter"b1"delegateViewForHeaderInSection"b1"delegateViewForFooterInSection"b1"delegateDisplayedItemCountForRowCount"b1"delegateDisplayStringForRowCount"b1"delegateAccessoryTypeForRow"b1"delegateAccessoryButtonTappedForRow"b1"delegateWillSelectRow"b1"delegateWillDeselectRow"b1"delegateDidSelectRow"b1"delegateDidDeselectRow"b1"delegateWillBeginEditing"b1"delegateDidEndEditing"b1"delegateWillMoveToRow"b1"delegateIndentationLevelForRow"b1"delegateWantsHeaderForSection"b1"delegateHeightForRowsInSection"b1"delegateMargin"b1"delegateHeaderTitleAlignment"b1"delegateFooterTitleAlignment"b1"delegateFrameForSectionIndexGivenProposedFrame"b1"delegateDidFinishReload"b1"delegateHeightForHeader"b1"delegateHeightForFooter"b1"delegateViewForHeader"b1"delegateViewForFooter"b1"delegateCalloutTargetRectForCell"b1"delegateShouldShowMenu"b1"delegateCanPerformAction"b1"delegatePerformAction"b1"delegateWillBeginReordering"b1"delegateDidEndReordering"b1"delegateDidCancelReordering"b1"delegateWillDisplayHeaderViewForSection"b1"delegateWillDisplayFooterViewForSection"b1"delegateShouldHighlightRow"b1"delegateDidHighlightRow"b1"delegateDidUnhighlightRow"b1"delegateTitleForSwipeAccessory"b1"delegateBackgroundColorForDeleteConfirmationButton"b1"delegateBackgroundColorForSwipeAccessory"b1"delegateDeleteConfirmationButton"b1"delegateSwipeAccessory"b1"delegateSwipeAccessoryPushed"b1"delegateShouldDrawTopSeparatorForSection"b1"delegateWillBeginSwiping"b1"delegateDidEndSwiping"b1"delegateCanFocusRow_deprecated"b1"delegateCanFocusRow"b1"delegateDidFocusRow"b1"delegateDidUnfocusRow"b1"delegateShouldChangeFocusedItem"b1"delegateIndexPathForPreferredFocusedItem"b1"delegateShouldUpdateFocusFromRowAtIndexPathToView"b1"delegateIndexPathForPreferredFocusedView"b1"delegateShouldUpdateFocusInContext"b1"delegateDidUpdateFocusInContext"b1"delegateTemplateLayoutCell"b1"delegateWillLayoutCellUsingTemplateLayoutCell"b1"delegateWasNonNil"b1"style"b1"separatorStyle"b3"wasEditing"b1"isEditing"b1"isEditingAllRows"b1"scrollsToSelection"b1"reloadSkippedDuringSuspension"b1"updating"b1"displaySkippedDuringSuspension"b1"needsReload"b1"updatingVisibleCellsManually"b1"scheduledUpdateVisibleCells"b1"scheduledUpdateVisibleCellsFrames"b1"warnForForcedCellUpdateDisabled"b1"displayTopSeparator"b1"countStringInsignificantRowCount"b4"needToAdjustExtraSeparators"b1"overlapsSectionHeaderViews"b1"ignoreTouchSelect"b1"lastHighlightedRowActive"b1"reloading"b1"allowsSelection"b1"allowsSelectionDuringEditing"b1"allowsMultipleSelection"b1"allowsMultipleSelectionDuringEditing"b1"showsSelectionImmediatelyOnTouchBegin"b1"indexHidden"b1"indexHiddenForSearch"b1"defaultShowsHorizontalScrollIndicator"b1"defaultShowsVerticalScrollIndicator"b1"sectionIndexTitlesLoaded"b1"tableHeaderViewShouldAutoHide"b1"tableHeaderViewIsHidden"b1"tableHeaderViewWasHidden"b1"tableHeaderViewShouldPin"b1"hideScrollIndicators"b1"sendReloadFinished"b1"keepFirstResponderWhenInteractionDisabled"b1"keepFirstResponderVisibleOnBoundsChange"b1"dontDrawTopShadowInGroupedSections"b1"forceStaticHeadersAndFooters"b1"displaysCellContentStringsOnTapAndHold"b1"displayingCellContentStringCallout"b1"longPressAutoscrollingActive"b1"adjustsRowHeightsForSectionLocation"b1"inInit"b1"inSetBackgroundColor"b1"inCreateTemplateCell"b1"usingCustomBackgroundView"b1"rowDataIndexPathsAreValidForCurrentCells"b1"committingDelete"b1"didReloadWhileCommittingDelete"b1"editingForSwipeDelete"b1"wasEditingForSwipeToDeleteBeforeSuspendedReload"b1"ignorePinnedTableHeaderUpdates"b1"navigationGestureWasEnabledBeforeSwipeToDelete"b1"didDisableNavigationGesture"b1"separatorsDrawAsOverlay"b1"swipeToDeleteRowIsBeingDeleted"b1"drawsSeparatorAtTopOfSections"b1"separatorBackdropOverlayBlendMode"b3"separatorsDrawInVibrantLightMode"b1"wrapCells"b1"showingIndexIndicatorOverlay"b1"showingIndexSelectionOverlay"b1"loadingOffscreenViews"b1"externalScreenHasTouch"b1"ignoringWheelEventsOnIndexOverlayIndicator"b1"deleteCancelationAnimationInProgress"b1"manuallyManagesSwipeUI"b1"allowsReorderingWhenNotEditing"b1"needsDeleteConfirmationCleanup"b1"resetContentOffsetAfterLayout"b1"cellsSelfSize"b1"usingCustomLayoutMargins"b1"settingDefaultLayoutMargins"b1"deallocating"b1"updateFocusAfterItemAnimations"b1"updateFocusAfterLoadingCells"b1"remembersLastFocusedIndexPath"b1"cellLayoutMarginsFollowReadableWidth"b1"sectionContentInsetFollowsLayoutMargins"b1}):(null)
+2016-04-01 15:25:01.255 OCRumtiimInvoke[5077:257772] delegateDidSelectRow: 0
+2016-04-01 15:25:01.255 OCRumtiimInvoke[5077:257772] _focusedCellIndexPath(@"NSIndexPath"):(null)
+2016-04-01 15:25:01.255 OCRumtiimInvoke[5077:257772] _focusedCell(@"UIView"):(null)
+2016-04-01 15:25:01.255 OCRumtiimInvoke[5077:257772] _indexPathToFocus(@"NSIndexPath"):(null)
+
+```
+
+我们注意到有这样一个变量名：`_tableFlags`，它的类型输出又是很大一串，我们基本可以肯定他是一个包含位域的结构体了，从它类型输出我们找到熟悉的字段『"delegateDidSelectRow"b1』，它表示的是delegate的方法`tableView:didSelectRowAtIndexPath:`的缓存标记，`b1`表示它占用了1个bit位。
+
+至此，我们找到了标记delegate方法缓存的`_tableFlags`结构体，我可以利用`valueForKey:`从UITableView实例中获取到`_tableFlags`的内容了。
+
+---
+可是，别高兴得太早。当你尝试用[_tableView valueForKey:@"_tableFlags"];去拿`_tableFlags`的值的时候，这个方法总是返回nil。
+
+原来，在Objective-C中是不支持位域结构体通过valueForKey返回的。
+
+！！！那怎么办！！！（休息一下）
+
+---
+
