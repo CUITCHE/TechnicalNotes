@@ -118,13 +118,12 @@
 ////        [anInvocation invoke];
 ////    }
 //}
-//
-//- (BOOL)respondsToSelector:(SEL)aSelector
-//{
-//    NSLog(@"%@", NSStringFromSelector(aSelector));
-//    BOOL suc = [NSStringFromSelector(aSelector) isEqualToString:NSStringFromSelector(@selector(tableView:didSelectRowAtIndexPath:))];
-//    return suc ?: [super respondsToSelector:aSelector];
-//}
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+    NSLog(@"%@", NSStringFromSelector(aSelector));
+    return [super respondsToSelector:aSelector];
+}
 @end
 ```
 
@@ -278,7 +277,7 @@ Apple在设计UITableView的时候，肯定也想到了。所以，我们就大�
 
 但，我们怎么获取到这个变量呢。
 
-Objective-C作为一门动态语言，获取一个变量（私有）还是很容易的。随便到网上搜一篇就详细的讲解，我这里直接贴代码了：
+Objective-C作为一门动态语言，获取一个变量（私有）还是很容易的。随便到网上搜一篇就有详细的讲解，我这里直接贴代码了：
 
 ```Objective-C
 - (void)onButtonClicked:(id)sender
@@ -326,9 +325,436 @@ Objective-C作为一门动态语言，获取一个变量（私有）还是很容
 ---
 可是，别高兴得太早。当你尝试用[_tableView valueForKey:@"_tableFlags"];去拿`_tableFlags`的值的时候，这个方法总是返回nil。
 
-原来，在Objective-C中是不支持位域结构体通过valueForKey返回的。
+原来，在Objective-C中是不支持位域结构体通过valueForKey返回的。至于为什么，我也不知道……
 
-！！！那怎么办！！！（休息一下）
+！！！那怎么办！！！（淡定，休息一下）
+
+---
+既然，我们得到了变量`_tableFlags`的类型描述字符串了，我们可以根据这个类型描述字符串构造一个这样的类型。（我是不是太聪明了- =）
+
+我就分割了一下这个类型描述串，最后得到这个结构体
+
+```
+typedef unsigned int _Type;
+typedef struct _TableViewFlags
+{
+    _Type dataSourceNumberOfRowsInSection : 1;
+    _Type dataSourceCellForRow : 1;
+    _Type dataSourceNumberOfSectionsInTableView : 1;
+    _Type dataSourceTitleForHeaderInSection : 1;
+    _Type dataSourceTitleForFooterInSection : 1;
+    _Type dataSourceDetailTextForHeaderInSection : 1;
+    _Type dataSourceCommitEditingStyle : 1;
+    _Type dataSourceSectionIndexTitlesForTableView : 1;
+    _Type dataSourceSectionForSectionIndexTitle : 1;
+    _Type dataSourceCanEditRow : 1;
+    _Type dataSourceCanMoveRow : 1;
+    _Type dataSourceCanUpdateRow : 1;
+    _Type dataSourceShouldShowMenu : 1;
+    _Type dataSourceCanPerformAction : 1;
+    _Type dataSourcePerformAction : 1;
+    _Type dataSourceIndexPathForSectionIndexTitle : 1;
+    _Type dataSourceWasNonNil : 1;
+    _Type delegateEditingStyleForRowAtIndexPath : 1;
+    _Type delegateTitleForDeleteConfirmationButtonForRowAtIndexPath : 1;
+    _Type delegateEditActionsForRowAtIndexPath : 1;
+    _Type delegateShouldIndentWhileEditing : 1;
+    _Type dataSourceMoveRow : 1;
+    _Type delegateCellForRow : 1;
+    _Type delegateWillDisplayCell : 1;
+    _Type delegateDidEndDisplayingCell : 1;
+    _Type delegateDidEndDisplayingSectionHeader : 1;
+    _Type delegateDidEndDisplayingSectionFooter : 1;
+    _Type delegateHeightForRow : 1;
+    _Type delegateHeightForSectionHeader : 1;
+    _Type delegateTitleWidthForSectionHeader : 1;
+    _Type delegateHeightForSectionFooter : 1;
+    _Type delegateTitleWidthForSectionFooter : 1;
+    _Type delegateEstimatedHeightForRow : 1;
+    _Type delegateEstimatedHeightForSectionHeader : 1;
+    _Type delegateEstimatedHeightForSectionFooter : 1;
+    _Type delegateViewForHeaderInSection : 1;
+    _Type delegateViewForFooterInSection : 1;
+    _Type delegateDisplayedItemCountForRowCount : 1;
+    _Type delegateDisplayStringForRowCount : 1;
+    _Type delegateAccessoryTypeForRow : 1;
+    _Type delegateAccessoryButtonTappedForRow : 1;
+    _Type delegateWillSelectRow : 1;
+    _Type delegateWillDeselectRow : 1;
+    _Type delegateDidSelectRow : 1;
+    _Type delegateDidDeselectRow : 1;
+    _Type delegateWillBeginEditing : 1;
+    _Type delegateDidEndEditing : 1;
+    _Type delegateWillMoveToRow : 1;
+    _Type delegateIndentationLevelForRow : 1;
+    _Type delegateWantsHeaderForSection : 1;
+    _Type delegateHeightForRowsInSection : 1;
+    _Type delegateMargin : 1;
+    _Type delegateHeaderTitleAlignment : 1;
+    _Type delegateFooterTitleAlignment : 1;
+    _Type delegateFrameForSectionIndexGivenProposedFrame : 1;
+    _Type delegateDidFinishReload : 1;
+    _Type delegateHeightForHeader : 1;
+    _Type delegateHeightForFooter : 1;
+    _Type delegateViewForHeader : 1;
+    _Type delegateViewForFooter : 1;
+    _Type delegateCalloutTargetRectForCell : 1;
+    _Type delegateShouldShowMenu : 1;
+    _Type delegateCanPerformAction : 1;
+    _Type delegatePerformAction : 1;
+    _Type delegateWillBeginReordering : 1;
+    _Type delegateDidEndReordering : 1;
+    _Type delegateDidCancelReordering : 1;
+    _Type delegateWillDisplayHeaderViewForSection : 1;
+    _Type delegateWillDisplayFooterViewForSection : 1;
+    _Type delegateShouldHighlightRow : 1;
+    _Type delegateDidHighlightRow : 1;
+    _Type delegateDidUnhighlightRow : 1;
+    _Type delegateTitleForSwipeAccessory : 1;
+    _Type delegateBackgroundColorForDeleteConfirmationButton : 1;
+    _Type delegateBackgroundColorForSwipeAccessory : 1;
+    _Type delegateDeleteConfirmationButton : 1;
+    _Type delegateSwipeAccessory : 1;
+    _Type delegateSwipeAccessoryPushed : 1;
+    _Type delegateShouldDrawTopSeparatorForSection : 1;
+    _Type delegateWillBeginSwiping : 1;
+    _Type delegateDidEndSwiping : 1;
+    _Type delegateCanFocusRow_deprecated : 1;
+    _Type delegateCanFocusRow : 1;
+    _Type delegateDidFocusRow : 1;
+    _Type delegateDidUnfocusRow : 1;
+    _Type delegateShouldChangeFocusedItem : 1;
+    _Type delegateIndexPathForPreferredFocusedItem : 1;
+    _Type delegateShouldUpdateFocusFromRowAtIndexPathToView : 1;
+    _Type delegateIndexPathForPreferredFocusedView : 1;
+    _Type delegateShouldUpdateFocusInContext : 1;
+    _Type delegateDidUpdateFocusInContext : 1;
+    _Type delegateTemplateLayoutCell : 1;
+    _Type delegateWillLayoutCellUsingTemplateLayoutCell : 1;
+    _Type delegateWasNonNil : 1;
+    _Type style : 1;
+    _Type separatorStyle : 3;
+    _Type wasEditing : 1;
+    _Type isEditing : 1;
+    _Type isEditingAllRows : 1;
+    _Type scrollsToSelection : 1;
+    _Type reloadSkippedDuringSuspension : 1;
+    _Type updating : 1;
+    _Type displaySkippedDuringSuspension : 1;
+    _Type needsReload : 1;
+    _Type updatingVisibleCellsManually : 1;
+    _Type scheduledUpdateVisibleCells : 1;
+    _Type scheduledUpdateVisibleCellsFrames : 1;
+    _Type warnForForcedCellUpdateDisabled : 1;
+    _Type displayTopSeparator : 1;
+    _Type countStringInsignificantRowCount : 4;
+    _Type needToAdjustExtraSeparators : 1;
+    _Type overlapsSectionHeaderViews : 1;
+    _Type ignoreTouchSelect : 1;
+    _Type lastHighlightedRowActive : 1;
+    _Type reloading : 1;
+    _Type allowsSelection : 1;
+    _Type allowsSelectionDuringEditing : 1;
+    _Type allowsMultipleSelection : 1;
+    _Type allowsMultipleSelectionDuringEditing : 1;
+    _Type showsSelectionImmediatelyOnTouchBegin : 1;
+    _Type indexHidden : 1;
+    _Type indexHiddenForSearch : 1;
+    _Type defaultShowsHorizontalScrollIndicator : 1;
+    _Type defaultShowsVerticalScrollIndicator : 1;
+    _Type sectionIndexTitlesLoaded : 1;
+    _Type tableHeaderViewShouldAutoHide : 1;
+    _Type tableHeaderViewIsHidden : 1;
+    _Type tableHeaderViewWasHidden : 1;
+    _Type tableHeaderViewShouldPin : 1;
+    _Type hideScrollIndicators : 1;
+    _Type sendReloadFinished : 1;
+    _Type keepFirstResponderWhenInteractionDisabled : 1;
+    _Type keepFirstResponderVisibleOnBoundsChange : 1;
+    _Type dontDrawTopShadowInGroupedSections : 1;
+    _Type forceStaticHeadersAndFooters : 1;
+    _Type displaysCellContentStringsOnTapAndHold : 1;
+    _Type displayingCellContentStringCallout : 1;
+    _Type longPressAutoscrollingActive : 1;
+    _Type adjustsRowHeightsForSectionLocation : 1;
+    _Type inInit : 1;
+    _Type inSetBackgroundColor : 1;
+    _Type inCreateTemplateCell : 1;
+    _Type usingCustomBackgroundView : 1;
+    _Type rowDataIndexPathsAreValidForCurrentCells : 1;
+    _Type committingDelete : 1;
+    _Type didReloadWhileCommittingDelete : 1;
+    _Type editingForSwipeDelete : 1;
+    _Type wasEditingForSwipeToDeleteBeforeSuspendedReload : 1;
+    _Type ignorePinnedTableHeaderUpdates : 1;
+    _Type navigationGestureWasEnabledBeforeSwipeToDelete : 1;
+    _Type didDisableNavigationGesture : 1;
+    _Type separatorsDrawAsOverlay : 1;
+    _Type swipeToDeleteRowIsBeingDeleted : 1;
+    _Type drawsSeparatorAtTopOfSections : 1;
+    _Type separatorBackdropOverlayBlendMode : 3;
+    _Type separatorsDrawInVibrantLightMode : 1;
+    _Type wrapCells : 1;
+    _Type showingIndexIndicatorOverlay : 1;
+    _Type showingIndexSelectionOverlay : 1;
+    _Type loadingOffscreenViews : 1;
+    _Type externalScreenHasTouch : 1;
+    _Type ignoringWheelEventsOnIndexOverlayIndicator : 1;
+    _Type deleteCancelationAnimationInProgress : 1;
+    _Type manuallyManagesSwipeUI : 1;
+    _Type allowsReorderingWhenNotEditing : 1;
+    _Type needsDeleteConfirmationCleanup : 1;
+    _Type resetContentOffsetAfterLayout : 1;
+    _Type cellsSelfSize : 1;
+    _Type usingCustomLayoutMargins : 1;
+    _Type settingDefaultLayoutMargins : 1;
+    _Type deallocating : 1;
+    _Type updateFocusAfterItemAnimations : 1;
+    _Type updateFocusAfterLoadingCells : 1;
+    _Type remembersLastFocusedIndexPath : 1;
+    _Type cellLayoutMarginsFollowReadableWidth : 1;
+    _Type sectionContentInsetFollowsLayoutMargins : 1;
+} _TableViewFlags;
+这里在定义_Type类型的时候不建议用int，1个bit的int，在输出表示的时候，会被输出成『-1』或者『0』，1个bit的int这唯一的空间被拿去表示正负数了- =。
+```
+
+Objective-C的成员变量，我们可以通过实例对象地址+成员变量地址偏移获得。利用这个，我们就可以获取到`_tableFlags`的值了。我们改造一下刚刚的函数吧：
+
+```Objective-C
+- (void)onButtonClicked:(id)sender
+{
+    Class curClass = NSClassFromString(@"UITableView");
+    unsigned int numIvars; //成员变量个数
+    Ivar *vars = class_copyIvarList(curClass, &numIvars);
+
+    NSString *name = nil;
+    NSString *type = nil;
+    for(int i = 0; i < numIvars; i++) {
+
+        Ivar thisIvar = vars[i];
+        name = [NSString stringWithUTF8String:ivar_getName(thisIvar)];  //获取成员变量的名字
+        type = [NSString stringWithUTF8String:ivar_getTypeEncoding(thisIvar)]; //获取成员变量的数据类型
+        @try {
+            NSLog(@"%@(%@):%@", name, type, [_tableView valueForKey:name]);
+            if (!strcmp(name.UTF8String, "_tableFlags")) {
+                typedef unsigned int _Type;
+                typedef struct _TableViewFlags
+                {
+                    _Type dataSourceNumberOfRowsInSection : 1;
+                    _Type dataSourceCellForRow : 1;
+                    _Type dataSourceNumberOfSectionsInTableView : 1;
+                    _Type dataSourceTitleForHeaderInSection : 1;
+                    _Type dataSourceTitleForFooterInSection : 1;
+                    _Type dataSourceDetailTextForHeaderInSection : 1;
+                    _Type dataSourceCommitEditingStyle : 1;
+                    _Type dataSourceSectionIndexTitlesForTableView : 1;
+                    _Type dataSourceSectionForSectionIndexTitle : 1;
+                    _Type dataSourceCanEditRow : 1;
+                    _Type dataSourceCanMoveRow : 1;
+                    _Type dataSourceCanUpdateRow : 1;
+                    _Type dataSourceShouldShowMenu : 1;
+                    _Type dataSourceCanPerformAction : 1;
+                    _Type dataSourcePerformAction : 1;
+                    _Type dataSourceIndexPathForSectionIndexTitle : 1;
+                    _Type dataSourceWasNonNil : 1;
+                    _Type delegateEditingStyleForRowAtIndexPath : 1;
+                    _Type delegateTitleForDeleteConfirmationButtonForRowAtIndexPath : 1;
+                    _Type delegateEditActionsForRowAtIndexPath : 1;
+                    _Type delegateShouldIndentWhileEditing : 1;
+                    _Type dataSourceMoveRow : 1;
+                    _Type delegateCellForRow : 1;
+                    _Type delegateWillDisplayCell : 1;
+                    _Type delegateDidEndDisplayingCell : 1;
+                    _Type delegateDidEndDisplayingSectionHeader : 1;
+                    _Type delegateDidEndDisplayingSectionFooter : 1;
+                    _Type delegateHeightForRow : 1;
+                    _Type delegateHeightForSectionHeader : 1;
+                    _Type delegateTitleWidthForSectionHeader : 1;
+                    _Type delegateHeightForSectionFooter : 1;
+                    _Type delegateTitleWidthForSectionFooter : 1;
+                    _Type delegateEstimatedHeightForRow : 1;
+                    _Type delegateEstimatedHeightForSectionHeader : 1;
+                    _Type delegateEstimatedHeightForSectionFooter : 1;
+                    _Type delegateViewForHeaderInSection : 1;
+                    _Type delegateViewForFooterInSection : 1;
+                    _Type delegateDisplayedItemCountForRowCount : 1;
+                    _Type delegateDisplayStringForRowCount : 1;
+                    _Type delegateAccessoryTypeForRow : 1;
+                    _Type delegateAccessoryButtonTappedForRow : 1;
+                    _Type delegateWillSelectRow : 1;
+                    _Type delegateWillDeselectRow : 1;
+                    _Type delegateDidSelectRow : 1;
+                    _Type delegateDidDeselectRow : 1;
+                    _Type delegateWillBeginEditing : 1;
+                    _Type delegateDidEndEditing : 1;
+                    _Type delegateWillMoveToRow : 1;
+                    _Type delegateIndentationLevelForRow : 1;
+                    _Type delegateWantsHeaderForSection : 1;
+                    _Type delegateHeightForRowsInSection : 1;
+                    _Type delegateMargin : 1;
+                    _Type delegateHeaderTitleAlignment : 1;
+                    _Type delegateFooterTitleAlignment : 1;
+                    _Type delegateFrameForSectionIndexGivenProposedFrame : 1;
+                    _Type delegateDidFinishReload : 1;
+                    _Type delegateHeightForHeader : 1;
+                    _Type delegateHeightForFooter : 1;
+                    _Type delegateViewForHeader : 1;
+                    _Type delegateViewForFooter : 1;
+                    _Type delegateCalloutTargetRectForCell : 1;
+                    _Type delegateShouldShowMenu : 1;
+                    _Type delegateCanPerformAction : 1;
+                    _Type delegatePerformAction : 1;
+                    _Type delegateWillBeginReordering : 1;
+                    _Type delegateDidEndReordering : 1;
+                    _Type delegateDidCancelReordering : 1;
+                    _Type delegateWillDisplayHeaderViewForSection : 1;
+                    _Type delegateWillDisplayFooterViewForSection : 1;
+                    _Type delegateShouldHighlightRow : 1;
+                    _Type delegateDidHighlightRow : 1;
+                    _Type delegateDidUnhighlightRow : 1;
+                    _Type delegateTitleForSwipeAccessory : 1;
+                    _Type delegateBackgroundColorForDeleteConfirmationButton : 1;
+                    _Type delegateBackgroundColorForSwipeAccessory : 1;
+                    _Type delegateDeleteConfirmationButton : 1;
+                    _Type delegateSwipeAccessory : 1;
+                    _Type delegateSwipeAccessoryPushed : 1;
+                    _Type delegateShouldDrawTopSeparatorForSection : 1;
+                    _Type delegateWillBeginSwiping : 1;
+                    _Type delegateDidEndSwiping : 1;
+                    _Type delegateCanFocusRow_deprecated : 1;
+                    _Type delegateCanFocusRow : 1;
+                    _Type delegateDidFocusRow : 1;
+                    _Type delegateDidUnfocusRow : 1;
+                    _Type delegateShouldChangeFocusedItem : 1;
+                    _Type delegateIndexPathForPreferredFocusedItem : 1;
+                    _Type delegateShouldUpdateFocusFromRowAtIndexPathToView : 1;
+                    _Type delegateIndexPathForPreferredFocusedView : 1;
+                    _Type delegateShouldUpdateFocusInContext : 1;
+                    _Type delegateDidUpdateFocusInContext : 1;
+                    _Type delegateTemplateLayoutCell : 1;
+                    _Type delegateWillLayoutCellUsingTemplateLayoutCell : 1;
+                    _Type delegateWasNonNil : 1;
+                    _Type style : 1;
+                    _Type separatorStyle : 3;
+                    _Type wasEditing : 1;
+                    _Type isEditing : 1;
+                    _Type isEditingAllRows : 1;
+                    _Type scrollsToSelection : 1;
+                    _Type reloadSkippedDuringSuspension : 1;
+                    _Type updating : 1;
+                    _Type displaySkippedDuringSuspension : 1;
+                    _Type needsReload : 1;
+                    _Type updatingVisibleCellsManually : 1;
+                    _Type scheduledUpdateVisibleCells : 1;
+                    _Type scheduledUpdateVisibleCellsFrames : 1;
+                    _Type warnForForcedCellUpdateDisabled : 1;
+                    _Type displayTopSeparator : 1;
+                    _Type countStringInsignificantRowCount : 4;
+                    _Type needToAdjustExtraSeparators : 1;
+                    _Type overlapsSectionHeaderViews : 1;
+                    _Type ignoreTouchSelect : 1;
+                    _Type lastHighlightedRowActive : 1;
+                    _Type reloading : 1;
+                    _Type allowsSelection : 1;
+                    _Type allowsSelectionDuringEditing : 1;
+                    _Type allowsMultipleSelection : 1;
+                    _Type allowsMultipleSelectionDuringEditing : 1;
+                    _Type showsSelectionImmediatelyOnTouchBegin : 1;
+                    _Type indexHidden : 1;
+                    _Type indexHiddenForSearch : 1;
+                    _Type defaultShowsHorizontalScrollIndicator : 1;
+                    _Type defaultShowsVerticalScrollIndicator : 1;
+                    _Type sectionIndexTitlesLoaded : 1;
+                    _Type tableHeaderViewShouldAutoHide : 1;
+                    _Type tableHeaderViewIsHidden : 1;
+                    _Type tableHeaderViewWasHidden : 1;
+                    _Type tableHeaderViewShouldPin : 1;
+                    _Type hideScrollIndicators : 1;
+                    _Type sendReloadFinished : 1;
+                    _Type keepFirstResponderWhenInteractionDisabled : 1;
+                    _Type keepFirstResponderVisibleOnBoundsChange : 1;
+                    _Type dontDrawTopShadowInGroupedSections : 1;
+                    _Type forceStaticHeadersAndFooters : 1;
+                    _Type displaysCellContentStringsOnTapAndHold : 1;
+                    _Type displayingCellContentStringCallout : 1;
+                    _Type longPressAutoscrollingActive : 1;
+                    _Type adjustsRowHeightsForSectionLocation : 1;
+                    _Type inInit : 1;
+                    _Type inSetBackgroundColor : 1;
+                    _Type inCreateTemplateCell : 1;
+                    _Type usingCustomBackgroundView : 1;
+                    _Type rowDataIndexPathsAreValidForCurrentCells : 1;
+                    _Type committingDelete : 1;
+                    _Type didReloadWhileCommittingDelete : 1;
+                    _Type editingForSwipeDelete : 1;
+                    _Type wasEditingForSwipeToDeleteBeforeSuspendedReload : 1;
+                    _Type ignorePinnedTableHeaderUpdates : 1;
+                    _Type navigationGestureWasEnabledBeforeSwipeToDelete : 1;
+                    _Type didDisableNavigationGesture : 1;
+                    _Type separatorsDrawAsOverlay : 1;
+                    _Type swipeToDeleteRowIsBeingDeleted : 1;
+                    _Type drawsSeparatorAtTopOfSections : 1;
+                    _Type separatorBackdropOverlayBlendMode : 3;
+                    _Type separatorsDrawInVibrantLightMode : 1;
+                    _Type wrapCells : 1;
+                    _Type showingIndexIndicatorOverlay : 1;
+                    _Type showingIndexSelectionOverlay : 1;
+                    _Type loadingOffscreenViews : 1;
+                    _Type externalScreenHasTouch : 1;
+                    _Type ignoringWheelEventsOnIndexOverlayIndicator : 1;
+                    _Type deleteCancelationAnimationInProgress : 1;
+                    _Type manuallyManagesSwipeUI : 1;
+                    _Type allowsReorderingWhenNotEditing : 1;
+                    _Type needsDeleteConfirmationCleanup : 1;
+                    _Type resetContentOffsetAfterLayout : 1;
+                    _Type cellsSelfSize : 1;
+                    _Type usingCustomLayoutMargins : 1;
+                    _Type settingDefaultLayoutMargins : 1;
+                    _Type deallocating : 1;
+                    _Type updateFocusAfterItemAnimations : 1;
+                    _Type updateFocusAfterLoadingCells : 1;
+                    _Type remembersLastFocusedIndexPath : 1;
+                    _Type cellLayoutMarginsFollowReadableWidth : 1;
+                    _Type sectionContentInsetFollowsLayoutMargins : 1;
+                } _TableViewFlags;
+                _TableViewFlags *p = (__bridge void *)_tableView + ivar_getOffset(thisIvar);
+                NSLog(@"delegateDidSelectRow: %d", p->delegateDidSelectRow);
+            }
+        } @catch (NSException *exception) {
+            NSLog(@"%@", exception);
+        } @finally {
+            ;
+        }
+    }
+    free(vars);
+}
+```
+
+为了验证我的想法，进行了两次程序调用：
+* 加载我的JSPatch文件，看`delegateDidSelectRow`的值。
+* 不加载JSPatch文件，看`delegateDidSelectRow`的值。
+
+最后的输出也成功验证了我的想法，加载JSPatch文件后，`delegateDidSelectRow`是1，没有加载的情况下，输出了0。
+
+至此，整个探索过程完毕。
 
 ---
 
+## 至于为什么Apple要在我们设置delegate的时候对delegate的方法进行一次询问并缓存询问的结果呢。
+
+我想每次运行到需要调用delegate的方法的时候就去调用一次`respondsToSelector:`去询问的代价相比一开始就把询问结果给缓存起来的代价要大很多。缓存后，运行时，只需要查询缓存结果就知道需不需要调用delegate的方法，这个速度会快很多！
+
+毕竟也没有谁像我一样在运行时去添加一个`UITableViewDataSource或UITableViewDelegate`中在编译时不存在的方法吧。
+
+## 适时更新TablFlag缓存
+所以，得到这些信息，我们在加载完JSPatch后更改一下对应缓存的值就行了。或许，你觉得直接重新对delegate进行一次赋值不就好了吗。就像这样
+
+```Objective-C
+_tableView.delegate = nil;
+_tableView.dataSource = nil;
+_tableView.delegate = self;
+_tableView.dataSource = self;
+```
+好吧，我承认这样一样有效，但是我不能保证这样没有副作用。建议还是直接更新缓存吧！
+
+*第一次完稿：2016-04-01 16:08:07*
