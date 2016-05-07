@@ -1,5 +1,5 @@
 # 论iOS协议NSSecureCoding的安全性
-我们知道`NSSecureCoding`协议可以完成一个Objective-C类的加密工作。我们只需要在一个类中实现`NSSecureCoding`协议的方法，通过调用`NSKeyedArchiver`类`+ (NSData *)archivedDataWithRootObject:;`就生成加密后的数据。然后通过`NSKeyedUnarchiver`的`+ (nullable id)unarchiveObjectWithData:;`方法来反解数据。例如这样：
+我们知道`NSSecureCoding`协议可以完成一个Objective-C类的加密工作。我们只需要在一个类中实现`NSSecureCoding`协议的方法，通过调用`NSKeyedArchiver`类`+ (NSData *)archivedDataWithRootObject:;`就可以生成加密后的数据。然后通过`NSKeyedUnarchiver`的`+ (nullable id)unarchiveObjectWithData:;`方法来反解数据。例如这样：
 ```Objective-C
 NSDictionary *security = @{/*some data*/}; // NSDictionary已经实现了NSSecureCoding协议。
 NSData *d = [NSKeyedArchiver archivedDataWithRootObject:security]; // 加密数据
@@ -57,7 +57,7 @@ NSLog(@"%@", data);
 运行一下。
 ![](/res/images/try0.png)
 
-果不其然，直接抛异常了。然而这个异常，缺给了我们足够的信息！
+果不其然，直接抛异常了。然而这个异常，却给了我们足够的信息！
 
 `cannot decode object of class (TBAreaEX) for key (NS.objects); the class may be defined in source code or a library that is not linked`，这份异常信息已经告诉我们原始的Objective-C类的类名是`TBAreaEX`。好的，我们就把这个名字替换我们之前的类名`Unknown`，并且实现`NSSecureCoding`协议。
 
@@ -89,17 +89,19 @@ NSLog(@"%@", data);
 ## 反解成员变量
 至此，我们还是不知道`TBAreaEX`到底拥有什么成员变量，成员变量的名字，类型，我们都还一无所知。
 
-这时候，我们需要回到原始数据文件`addressManager.data`上，我们已经知道类名是`TBAreaEX`，所以我们可以尝试在这份数据里搜索`TBAreaEX`，看有没有什么收货。
+这时候，我们需要回到原始数据文件`addressManager.data`上，我们已经知道类名是`TBAreaEX`，所以我们可以尝试在这份数据里搜索`TBAreaEX`，看有没有什么收获。
 
 ![](/res/images/try1.png)
 
-我们成功搜索到了`TBAreaEX`，我们大胆假设，成员变量的名字应该在它的上面或者下面，我们仔细找找。
+我们成功搜索到了`TBAreaEX`，我们大胆假设，成员变量的名字应该在它出现位置的上面或者下面，我们仔细找找。
 
 ![](/res/images/try2.png)
 
-最终我们看到了一些比较在意的字符串。`post code leaf name children`看起来和地址的要素很是相关呢。`post`就是邮编，`code`应该是地区编号。`leaf`目前尚不清楚，`name`就是省市区的名字，`children`就是某省的城市集合，或者是某市的区县集合了。
+最终我们看到了一些比较在意的字符串。`post code leaf name children`看起来和地址的要素很是相关呢。`post`就是邮编，`code`应该是地区编号，`leaf`目前尚不清楚，`name`就是省市区的名字，`children`就是某省的城市集合，或者是某市的区县集合了。
 
-成员变量的名字就算是找到了，但是类型呢。`name`应该是`NSString`没错。`post`和`code`就不一定了，有可能是整型，也有可能字符串类型。这些猜测，似乎有道理，但是我们忘记了Objective-C是运行时决定变量类型的，故，我们不需要管类型，直接将成员变量声明为`id`类型即可。
+成员变量的名字就算是找到了，但是类型呢。`name`应该是`NSString`没错。`post`和`code`就不一定了，有可能是整型，也有可能字符串类型。这些猜测，似乎有道理，但是我们忘记了Objective-C是运行时决定变量类型的。故，我们不需要管类型，直接将成员变量声明为`id`类型即可。
+
+ > 也可以指定类型。如果类型错了，系统会抛出异常，异常里面会带有正确类型的信息。
 
 于是，我们就可以把这些数据补充到我们写的`TBAreaEX`中。
 ```Objective-C
@@ -184,7 +186,7 @@ NSLog(@"%@", data);
 @end
 ```
 
-运行之后，我们就得到天猫加密后的地址数据了。
+运行之后，我们就可以得到天猫加密后的地址数据了。
 
 ## 无法反解的变量
 其中有一个变量`leaf`，我尝试过用`id`去读取它的值，然而我失败了。可能是另外的存取方式，而且很有可能就是天猫存的街道数据。根据UTF-8的编码方式，我尝试搜索了`东华`（北京市东城区的东华门街道）是可以在`addressManager.data`中搜索到的。这也算是天猫给我们隐藏的小小『惊喜』吧。
@@ -193,3 +195,4 @@ NSLog(@"%@", data);
 
 # 修订记录
 2016-05-08 01:25:59 第一次完稿
+2016-05-08 01:39:40 修正
