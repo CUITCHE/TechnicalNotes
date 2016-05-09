@@ -1,0 +1,6 @@
+{
+  "name": "Technicalnotes",
+  "tagline": "随手记录一些计算机技术方面的笔记。目前只有iOS相关的",
+  "body": "# TechnicalNotes\r\n随手记录一些计算机技术方面的笔记\r\n\r\niOS相关目录\r\n* [iOS-UITableView之delegate方法的缓存](./iOS-UITableView之delegate方法的缓存.md)\r\n* [论iOS协议NSSecureCoding的安全性](./论iOS协议NSSecureCoding的安全性.md)\r\n\r\n# LICENSE\r\nGNU General Public License v3.0",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
