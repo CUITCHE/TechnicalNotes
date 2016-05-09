@@ -193,6 +193,27 @@ NSLog(@"%@", data);
 
 如果你找到了破解方法一定要告诉我啊！
 
+## 结论
+综上，我们可以看出，即使天猫对数据用Apple的`NSSecureCoding`协议加密了，我们还是可以通过简单的反解得到数据。天猫作为这么大的企业，应该是意识到这个问题，可能只是给获得数据的我们设置一道门槛，不让轻易获得数据，即使获得了，也算是一种认可吧，毕竟还有个`leaf`字段还没有被反解出来呢。
+
+`NSSecureCoding`的加密方式不可靠，所以对于比较重要的数据就不要采用这个协议加密了。
+
+## NSSecureCoding的改进
+* 我们可以把`[aCoder encodeObject:_post forKey:@"post"];`的`post`字符串改成其它无人类语言化的字符组合。
+* 上面的方面治标不治本。因为我们可以根据`NSSecureCoding`中的`T`分隔符找到关键key。所以，我们从`addressManager.data`中可以看到，`post`和`code`即成员变量的间隔是用字符`T`来分割，那么我们就可以利用这个用`TTTTTTT`N个'T'来作为NSCoder的key，让破解查找关键字变得费力！例如：
+
+    ```Objective-C
+    - (void)encodeWithCoder:(NSCoder *)aCoder
+    {
+        [aCoder encodeObject:_post forKey:@"TTTTTTTTTTTTTT"];
+        [aCoder encodeObject:_code forKey:@"TTTTTTTTTTT"];
+        [aCoder encodeObject:_name forKey:@"TTTTTTT"];
+        [aCoder encodeObject:_children forKey:@"TTTTTTTTTTT"];
+    }
+    ```
+* 我们可以根据类名的偏移量找到关键字，而且用N个`T`的key，可以在O(N * k)（k是key的个数，N是key的最长长度）的时间复杂度中找出。鉴于此，我们可以把这份文件我们再加密一次。这样做的话，又增加了加密函数编写的难度。所以我推荐第二种方式足矣。
+
 # 修订记录
 * 2016-05-08 01:25:59 第一次完稿
 * 2016-05-08 01:39:40 修正
+* 2016-05-09 13:56:20 添加『NSSecureCoding的改进』和『结论』
